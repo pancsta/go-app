@@ -1,3 +1,10 @@
+# FORK
+
+- disable service worker
+- cache busting ?v= for JS and WASM
+
+# ORIGIN
+
 <h1 align="center">
     <a href="https://go-app.dev">
         <img alt="go-app"  width="150" height="150" src="docs/web/icon.png">

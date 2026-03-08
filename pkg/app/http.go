@@ -280,11 +280,11 @@ func (h *Handler) initPWAResources() {
 		Body:        h.makeAppJS(),
 	})
 
-	h.cachedPWAResources.Set(cacheItem{
-		Path:        "/app-worker.js",
-		ContentType: "application/javascript",
-		Body:        h.makeAppWorkerJS(),
-	})
+	// h.cachedPWAResources.Set(cacheItem{
+	// 	Path:        "/app-worker.js",
+	// 	ContentType: "application/javascript",
+	// 	Body:        h.makeAppWorkerJS(),
+	// })
 
 	h.cachedPWAResources.Set(cacheItem{
 		Path:        "/manifest.webmanifest",
@@ -318,13 +318,14 @@ func (h *Handler) makeAppJS() []byte {
 		}
 	}
 
+	bustCache := fmt.Sprintf("?v=%d", time.Now().UnixNano())
 	s := appJS
 	s = strings.ReplaceAll(s, "{{.Env}}", jsonString(h.Env))
 	s = strings.ReplaceAll(s, "{{.LoadingLabel}}", h.LoadingLabel)
-	s = strings.ReplaceAll(s, "{{.Wasm}}", h.Resources.Resolve("/web/app.wasm"))
+	s = strings.ReplaceAll(s, "{{.Wasm}}", h.Resources.Resolve("/web/app.wasm")+bustCache)
 	s = strings.ReplaceAll(s, "{{.WasmContentLength}}", h.WasmContentLength)
 	s = strings.ReplaceAll(s, "{{.WasmContentLengthHeader}}", h.WasmContentLengthHeader)
-	s = strings.ReplaceAll(s, "{{.WorkerJS}}", h.Resources.Resolve("/app-worker.js"))
+	s = strings.ReplaceAll(s, "goappInitServiceWorker();", "//goappInitServiceWorker();")
 	return []byte(s)
 }
 
@@ -643,6 +644,7 @@ func (h *Handler) servePage(w http.ResponseWriter, r *http.Request) {
 		icon = h.Icon.Default
 	}
 
+	bustCache := fmt.Sprintf("?v=%d", time.Now().UnixNano())
 	var b bytes.Buffer
 	err := engine.Encode(&b, h.HTML().
 		Lang(page.Lang()).
@@ -754,7 +756,7 @@ func (h *Handler) servePage(w http.ResponseWriter, r *http.Request) {
 					Src("/wasm_exec.js"),
 				Script().
 					Defer(true).
-					Src("/app.js"),
+					Src("/app.js"+bustCache),
 				Range(h.Scripts).Slice(func(i int) UI {
 					if resource := parseHTTPResource(h.Scripts[i]); resource.URL != "" {
 						return resource.toScript()
