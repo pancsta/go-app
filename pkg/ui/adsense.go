@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/maxence-charriere/go-app/v10/pkg/logs"
+	"github.com/pancsta/go-app/pkg/app"
+	"github.com/pancsta/go-app/pkg/logs"
 )
 
 // IAdsenseDisplay is the interface that describes a responsive Adsense display

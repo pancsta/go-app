@@ -2,7 +2,7 @@ package ui
 
 import (
 	"github.com/google/uuid"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/pancsta/go-app/pkg/app"
 )
 
 // IShell is the interface that describes a layout that responsively displays a

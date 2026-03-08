@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/analytics"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/pancsta/go-app/pkg/analytics"
+	"github.com/pancsta/go-app/pkg/app"
 )
 
 type declarativeSyntaxPage struct {

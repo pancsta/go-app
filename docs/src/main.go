@@ -12,12 +12,12 @@ import (
 	"syscall"
 
 	"github.com/SherClockHolmes/webpush-go"
-	"github.com/maxence-charriere/go-app/v10/pkg/analytics"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/maxence-charriere/go-app/v10/pkg/cli"
-	"github.com/maxence-charriere/go-app/v10/pkg/errors"
-	"github.com/maxence-charriere/go-app/v10/pkg/logs"
-	"github.com/maxence-charriere/go-app/v10/pkg/ui"
+	"github.com/pancsta/go-app/pkg/analytics"
+	"github.com/pancsta/go-app/pkg/app"
+	"github.com/pancsta/go-app/pkg/cli"
+	"github.com/pancsta/go-app/pkg/errors"
+	"github.com/pancsta/go-app/pkg/logs"
+	"github.com/pancsta/go-app/pkg/ui"
 )
 
 const (
