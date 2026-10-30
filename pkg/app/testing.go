@@ -27,6 +27,8 @@ type TestEngine interface {
 	// component's state is fully updated, allowing for accurate assertions and
 	// verifications in test scenarios.
 	ConsumeAll()
+
+	Start(framerate int)
 }
 
 // NewTestEngine creates and returns a new instance of test engine configured

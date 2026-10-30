@@ -9,6 +9,10 @@ type EventHandler func(ctx Context, e Event)
 // Event is the interface that describes a javascript event.
 type Event struct {
 	Value
+
+	// Data carries event attributes in server-side renderers, eg livepage.
+	// It is nil in browser-based events.
+	Data map[string]string
 }
 
 // PreventDefault cancels the event if it is cancelable. The default action that

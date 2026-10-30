@@ -21,6 +21,8 @@ type HTML interface {
 	depth() uint
 	attrs() attributes
 	setAttrs(attributes) HTML
+	// SetAttr sets an HTML attribute.
+	SetAttr(name string, value any)
 	events() eventHandlers
 	setEvents(eventHandlers) HTML
 	setDepth(uint) UI
@@ -75,6 +77,11 @@ func (e *htmlElement) setAttr(name string, value any) {
 		e.attributes = make(attributes)
 	}
 	e.attributes.Set(name, value)
+}
+
+// SetAttr sets an HTML attribute.
+func (e *htmlElement) SetAttr(name string, value any) {
+	e.setAttr(name, value)
 }
 
 func (e *htmlElement) events() eventHandlers {

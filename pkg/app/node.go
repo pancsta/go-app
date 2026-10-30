@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"html"
 	"io"
+	"maps"
 	"reflect"
+	"slices"
+	"sort"
 	"strconv"
 	"time"
 
@@ -77,7 +80,14 @@ func FilterUIElems(v ...UI) []UI {
 // HTMLString returns a string that represents the HTML markup for the provided
 // UI element.
 func HTMLString(ui UI) string {
+	return HTMLStringWithEvents(ui, nil)
+}
+
+// HTMLStringWithEvents is HTMLString with an EventBridge, allowing a server
+// renderer to receive event handlers.
+func HTMLStringWithEvents(ui UI, bridge EventBridge) string {
 	engine := NewTestEngine().(*engineX)
+	engine.nodes.eventBridge = bridge
 	var b bytes.Buffer
 	engine.nodes.Encode(engine.baseContext(), &b, ui)
 	return b.String()
@@ -95,9 +105,15 @@ type appUpdate struct{}
 type appInstallChange struct{}
 type resize struct{}
 
+// EventBridge receives event handlers during server-side HTML rendering.
+// Returning true means the handler was consumed and should not be rendered.
+type EventBridge func(element HTML, event string, handler EventHandler) bool
+
 // nodeManager orchestrates the lifecycle of UI elements, providing specialized
 // mechanisms for mounting, dismounting, and updating nodes.
 type nodeManager struct {
+	// eventBridge is optional and used by server-side renderers, eg livepage.
+	eventBridge EventBridge
 }
 
 // Mount mounts a UI element based on its type and the specified depth. It
@@ -233,7 +249,9 @@ func (m nodeManager) mountComponent(ctx Context, depth uint, v Composer) (UI, er
 		ctx.Dispatch(preRenderer.OnPreRender)
 	}
 
-	if mounter, ok := v.(Mounter); ok && IsClient {
+	// if mounter, ok := v.(Mounter); ok && IsClient {
+	mounter, ok := v.(Mounter)
+	if ok {
 		ctx.Dispatch(mounter.OnMount)
 	}
 
@@ -697,10 +715,19 @@ func (m nodeManager) encodeIndent(w *bytes.Buffer, depth int) {
 }
 
 func (m nodeManager) encodeHTML(ctx Context, w *bytes.Buffer, depth int, v HTML) {
+	if m.eventBridge != nil {
+		for event, handler := range v.events() {
+			m.eventBridge(v, event, handler.goHandler)
+		}
+	}
+
 	m.encodeIndent(w, depth)
 	w.WriteByte('<')
 	w.WriteString(v.Tag())
-	for name, value := range v.attrs() {
+	keys := slices.Collect(maps.Keys(v.attrs()))
+	sort.Strings(keys)
+	for _, name := range keys {
+		value := v.attrs()[name]
 		m.encodeHTMLAttribute(ctx, w, name, value)
 	}
 	w.WriteByte('>')
